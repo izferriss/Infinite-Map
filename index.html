@@ -1,0 +1,157 @@
+<html>
+    <head>
+        <title>Infinite Map</title>
+        <style>
+            #canvas
+            {
+                border: 1px solid black;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="canvas" width="480" height="320"></canvas>
+
+        <script>
+            // Get the canvas element and its context
+            const canvas = document.getElementById("canvas");
+            const ctx = canvas.getContext("2d");
+
+            // Background image
+            const backgroundImage = new Image();
+            backgroundImage.src = "background.png";
+
+            // Player object
+            const player =
+            {
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                width: 32,
+                height: 32,
+                speed: 32
+            };
+
+            // Function to handle player movement
+            function movePlayer(dx, dy)
+            {
+                // Update background position based on player movement
+                backgroundX -= dx;
+                backgroundY -= dy;
+
+                // Handle background wrapping
+                if(backgroundX < -backgroundImage.width)
+                {
+                    backgroundX += backgroundImage.width;
+                }
+                else if(backgroundX > 0)
+                {
+                    backgroundX -= backgroundImage.width;
+                }
+
+                if(backgroundY < -backgroundImage.height)
+                {
+                    backgroundY += backgroundImage.height;
+                }
+                else if(backgroundY > 0)
+                {
+                    backgroundY -= backgroundImage.height;
+                }
+
+                // Redraw the background and player
+                drawBackground();
+                drawPlayer();
+            }
+
+            // Function to handle key presses
+            function handleKeyPress(event)
+            {
+                switch (event.key)
+                {
+                    case "ArrowDown":
+                        movePlayer(0, player.speed);
+                        break;
+                    case "ArrowUp":
+                        movePlayer(0, -player.speed);
+                        break;
+                    case "ArrowRight":
+                        movePlayer(player.speed, 0);
+                        break;
+                    case "ArrowLeft":
+                        movePlayer(-player.speed, 0);
+                        break;
+                }
+            }
+
+            // Add key press event listener
+            window.addEventListener("keydown", handleKeyPress);
+
+            // Variables to track background position
+            let backgroundX = 0;
+            let backgroundY = 0;
+
+            // Function to draw the player
+            function drawPlayer()
+            {
+                // Draw the player
+                ctx.fillStyle = "red";
+                ctx.fillRect(
+                    canvas.width / 2 - player.width / 2,
+                    canvas.height / 2 - player.height / 2,
+                    player.width,
+                    player.height
+                );
+            }
+
+            // Function to handle background rendering
+            function drawBackground()
+            {
+                // Clear the canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw the background image
+                for(let x = backgroundX; x < canvas.width; x += backgroundImage.width)
+                {
+                    for(let y = backgroundY; y < canvas.height; y += backgroundImage.height)
+                    {
+                        ctx.drawImage(backgroundImage, x, y);
+                    }
+                }
+
+                // Handle wrapping around in the horizontal direction
+                for(let x = backgroundX - backgroundImage.width; x >= -canvas.width; x -= backgroundImage.width)
+                {
+                    for(let y = backgroundY; y < canvas.height; y += backgroundImage.height)
+                    {
+                        ctx.drawImage(backgroundImage, x, y);
+                    }
+                }
+
+                // Handle wrapping around in the vertical direction
+                for(let x = backgroundX; x < canvas.width; x += backgroundImage.width)
+                {
+                    for(let y = backgroundY - backgroundImage.height; y >= -canvas.height; y -= backgroundImage.height)
+                    {
+                        ctx.drawImage(backgroundImage, x, y);
+                    }
+                }
+
+                // Handle wrapping around in both horizontal and vertical directions
+                for(let x = backgroundX - backgroundImage.width; x >= -canvas.width; x -= backgroundImage.width)
+                {
+                    for(let y = backgroundY - backgroundImage.height; y >= -canvas.height; y -= backgroundImage.height)
+                    {
+                        ctx.drawImage(backgroundImage, x, y);
+                    }
+                }
+            }
+
+
+            // Load the background image
+            backgroundImage.onload = function ()
+            {
+                // Initial rendering of the viewport
+                drawBackground();
+                drawPlayer();
+            };
+        </script>
+    </body>
+</html>
